@@ -50,7 +50,7 @@ def main():
             play_sound_repeatedly_for_20_seconds()
         
         # Wait for a while before checking again
-        time.sleep(10)
+        time.sleep(5)
 
 if __name__ == '__main__':
     main()
