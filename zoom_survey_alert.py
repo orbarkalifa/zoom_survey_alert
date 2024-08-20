@@ -4,53 +4,51 @@ import pyautogui
 import pygame
 import time
 
-# Path to the image template and alert sound file
+# Constants for file paths and settings
 TEMPLATE_PATH = r'C:\Users\orbar\Desktop\zoom_survey_alert\poll_template.png'
 ALERT_SOUND_PATH = r'C:\Users\orbar\Desktop\zoom_survey_alert\alert_sound.mp3'
+DETECTION_THRESHOLD = 0.8
+CHECK_INTERVAL = 5  # seconds
+ALERT_DURATION = 20  # seconds
+ALERT_REPEAT_INTERVAL = 1.5  # seconds
 
 # Initialize pygame mixer for sound playback
 pygame.mixer.init()
 
-def detect_poll():
-    # Load the template image
-    template = cv2.imread(TEMPLATE_PATH, cv2.IMREAD_GRAYSCALE)
-    w, h = template.shape[::-1]
+def load_template(template_path):
+    """Load and return the template image in grayscale."""
+    return cv2.imread(template_path, cv2.IMREAD_GRAYSCALE)
 
-    # Capture a screenshot and convert to grayscale
+def capture_screenshot():
+    """Capture a screenshot and return it as a grayscale image."""
     screenshot = pyautogui.screenshot()
-    screenshot = np.array(screenshot)
-    screenshot_gray = cv2.cvtColor(screenshot, cv2.COLOR_RGB2GRAY)
+    screenshot_array = np.array(screenshot)
+    return cv2.cvtColor(screenshot_array, cv2.COLOR_RGB2GRAY)
 
-    # Perform template matching
+def is_poll_detected(template, screenshot_gray, threshold=DETECTION_THRESHOLD):
+    """Perform template matching and return True if a match is found."""
     res = cv2.matchTemplate(screenshot_gray, template, cv2.TM_CCOEFF_NORMED)
-    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+    _, max_val, _, _ = cv2.minMaxLoc(res)
+    print(f"Template matching confidence: {max_val}")  # Debugging output
+    return max_val >= threshold
 
-    # Debugging: Print confidence value
-    print(f"Template matching confidence: {max_val}")
-
-    # Set a threshold for detection
-    threshold = 0.8
-    if max_val >= threshold:
-        print("Poll/quiz detected!")
-        return True
-    else:
-        print("Poll/quiz not detected.")
-        return False
-
-def play_sound_repeatedly_for_20_seconds():
-    start_time = time.time()
-    while time.time() - start_time < 20:  # Play for 20 seconds
-        pygame.mixer.music.load(ALERT_SOUND_PATH)
+def play_sound_for_duration(sound_path, duration=ALERT_DURATION, interval=ALERT_REPEAT_INTERVAL):
+    """Play the alert sound repeatedly for the specified duration."""
+    pygame.mixer.music.load(sound_path)
+    end_time = time.time() + duration
+    while time.time() < end_time:
         pygame.mixer.music.play()
-        time.sleep(1.5)  # Adjust this based on sound length if needed
+        time.sleep(interval)
 
 def main():
+    template = load_template(TEMPLATE_PATH)
+    
     while True:
-        if detect_poll():
-            play_sound_repeatedly_for_20_seconds()
+        screenshot_gray = capture_screenshot()
+        if is_poll_detected(template, screenshot_gray):
+            play_sound_for_duration(ALERT_SOUND_PATH)
         
-        # Wait for a while before checking again
-        time.sleep(5)
+        time.sleep(CHECK_INTERVAL)
 
 if __name__ == '__main__':
     main()

@@ -5,7 +5,7 @@ a = Analysis(
     ['zoom_survey_alert.py'],
     pathex=[],
     binaries=[],
-    datas=[('C:\\Users\\orbar\\Desktop\\zoom_survey_alert\\alert_sound.mp3', '.'), ('C:\\Users\\orbar\\Desktop\\zoom_survey_alert\\poll_template.png', '.')],
+    datas=[('alert_sound.mp3', '.'), ('poll_template.png', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
