@@ -1,6 +1,6 @@
 @echo off
 cd C://Users/orbar/Desktop/zoom_survey_alert
-start "" python ./zoom_survey_alert.py
+start "" python ./zoom_poll_detector.py
 timeout /t 5 /nobreak
 start "" "https://idc-il.zoom.us/j/5283915830"
 
@@ -9,7 +9,7 @@ timeout /t 5 /nobreak
 rem Focus the browser window
 powershell -command "$wshell = New-Object -ComObject wscript.shell; $wshell.AppActivate('Google Chrome')"
 
-timeout /t 5 /nobreak
+timeout /t 2 /nobreak
 
 rem Press the left arrow key
 powershell -command "$wshell = New-Object -ComObject wscript.shell; $wshell.SendKeys('{LEFT}')"
